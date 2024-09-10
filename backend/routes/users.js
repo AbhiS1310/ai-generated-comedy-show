@@ -21,7 +21,7 @@ router.post("/create-user", async (req, res, next) => {
       };
       const activationToken = createActivationToken(user);
   
-      const activationUrl = `http://localhost:3000/activation/${activationToken}`;
+      const activationUrl = `https://ai-generated-comedy-show-3tl8.vercel.app/activation/${activationToken}`;
  
       try {
         await sendMail({
