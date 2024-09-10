@@ -143,7 +143,7 @@ router.post("/create-user", async (req, res, next) => {
         if (!user) {
           return next(new ErrorHandler("User doesn't exists", 400));
         }
-        console.log(user);
+        // console.log(user);
         res.status(200).json({
           success: true,
           user,

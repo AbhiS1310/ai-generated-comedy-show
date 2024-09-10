@@ -6,6 +6,12 @@ const { isAuthenticated } = require("../middleware/auth");
 
 router.get("/get-video/:id",isAuthenticated, async(req,res,next)=>{
     try{
+      const user = req.user;
+    if(user.credits<2){
+        return next(new ErrorHandler("You dont have enough credits please upgrade!"));
+    }
+    user.credits-=2;
+    user.save();
       const options = {
         method: 'GET',
         url: `https://api.d-id.com/clips/${req.params.id}`,

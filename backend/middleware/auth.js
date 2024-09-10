@@ -10,13 +10,7 @@ exports.isAuthenticated = catchAsyncErrors(async(req,res,next) => {
         return next(new ErrorHandler("Please login to continue", 401));
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const user = await User.findById(decoded.id);
-    console.log(user);
-    if(user.credits<2){
-        return next(new ErrorHandler("You dont have enough credits please upgrade!"));
-    }
-    user.credits-=2;
-    user.save();
+    req.user = await User.findById(decoded.id);
     next();
 });
 

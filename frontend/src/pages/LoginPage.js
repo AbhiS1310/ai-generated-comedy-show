@@ -35,7 +35,6 @@ const LoginPage = () => {
         console.log(err.response.data.message);
         toast.error(err.response.data.message);
       });
-    console.log('Logging in with:', { email, password });
   };
 
   return (

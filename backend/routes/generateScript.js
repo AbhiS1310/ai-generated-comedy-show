@@ -11,6 +11,13 @@ router.post('/generate-script',isAuthenticated, async (req, res, next) => {
   console.log("hi");
     try {
       // Generate a prompt for the AI based on user input
+      // console.log(req.user);
+      const user = req.user;
+    if(user.credits<2){
+        return next(new ErrorHandler("You dont have enough credits please upgrade!"));
+    }
+    user.credits-=2;
+    user.save();
       const prompt = cprompt || `Generate a comedy script for a stand-up performance based on the following parameters:
 
 - Theme: ${theme}
