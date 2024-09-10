@@ -1,0 +1,24 @@
+const ErrorHandler = require("../utils/ErrorHandler");
+const catchAsyncErrors = require("./catchAsyncErrors");
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+
+exports.isAuthenticated = catchAsyncErrors(async(req,res,next) => {
+    const {token} = req.cookies;
+    console.log(token);
+    if(!token){
+        return next(new ErrorHandler("Please login to continue", 401));
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const user = await User.findById(decoded.id);
+    console.log(user);
+    if(user.credits<2){
+        return next(new ErrorHandler("You dont have enough credits please upgrade!"));
+    }
+    user.credits-=2;
+    user.save();
+    next();
+});
+
+
+

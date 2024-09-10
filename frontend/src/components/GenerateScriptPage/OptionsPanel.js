@@ -1,43 +1,58 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState,useContext } from 'react';
+import axios from 'axios'; 
+import { toast } from "react-toastify";
+import { AuthContext } from '../../context/AuthContext';
+import { server } from '../../server';
+import { useNavigate } from "react-router-dom";
 
-function ComedyForm({ formData, onSubmit }) {
-  const [data, setData] = useState(formData);
-  const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    setData({
-      ...data,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const response = await axios.post('http://localhost:5000/generate-script', data);
-      const generatedScript = response.data.script;
-
-      setLoading(false);
-      onSubmit({ ...data, script: generatedScript });
-    } catch (error) {
-      console.error("Error generating script:", error);
-      setLoading(false);
-      alert(error);
+const OptionsPanel = ({ formData }) => {
+    const [data, setData] = useState(formData);
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const {setScript, script} = useContext(AuthContext);
+    const handleClick = ()=>{
+      if(!script)toast.warning("First generate your script...");
+      else navigate("/generate-video");
     }
+    const handleChange = (e) => {
+        setData({
+          ...data,
+          [e.target.name]: e.target.value,
+        });
+      };
+  const handleGenerate = async (e) => {
+    e.preventDefault();
+    setLoading("true");
+    try {
+        const response = await axios.post(`${server}/generate-script`, data,{
+          withCredentials: true,
+          headers: {
+            'Content-Type': "application/json"
+          }
+        });
+        const generatedScript = response.data.script;
+        setScript(generatedScript);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error generating script:", error);
+        setLoading(false);
+        toast.error(error.response.data.message);
+      }
   };
+//   const [loading, setLoading] = useState(false);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2">
-      <div>
-        <label className="block text-lg font-medium">Type of Comedy:</label>
+    <div className="bg-gray-100 p-4 shadow-lg rounded-lg h-full">
+      <h3 className="text-2xl font-semibold mb-4">Customize Your Script</h3>
+      <form onSubmit={handleGenerate} className="space-y-2">
+      <div className="mb-2">
+      <label className="block text-lg font-medium">Type of Comedy:</label>
         <select
           name="comedyType"
           value={data.comedyType}
           onChange={handleChange}
           required
-          className="block w-full mt-1 p-2 bg-gray-700 border border-gray-600 rounded"
+          className="block w-full mt-1 p-2 border border-gray-600 rounded"
         >
           <option value="" disabled>Select comedy type</option>
           <option value="standup">Standup Comedy</option>
@@ -56,7 +71,7 @@ function ComedyForm({ formData, onSubmit }) {
           onChange={handleChange}
           placeholder="e.g., Technology"
           required
-          className="block w-full mt-1 p-2 bg-gray-700 border border-gray-600 rounded"
+          className="block w-full mt-1 p-2 border border-gray-600 rounded"
         />
       </div>
       <div>
@@ -68,7 +83,7 @@ function ComedyForm({ formData, onSubmit }) {
           onChange={handleChange}
           placeholder="e.g., Clumsy Detective"
           required
-          className="block w-full mt-1 p-2 bg-gray-700 border border-gray-600 rounded"
+          className="block w-full mt-1 p-2 border border-gray-600 rounded"
         >
           <option value="" disabled>Select Tone</option>
           <option value="Absurd">Absurd</option>
@@ -86,7 +101,7 @@ function ComedyForm({ formData, onSubmit }) {
           onChange={handleChange}
           placeholder="e.g., Clumsy Detective"
           required
-          className="block w-full mt-1 p-2 bg-gray-700 border border-gray-600 rounded"
+          className="block w-full mt-1 p-2 border border-gray-600 rounded"
         >
           <option value="" disabled>Select</option>
           <option value="Kids (5-12)">Kids (5-12)</option>
@@ -106,7 +121,7 @@ function ComedyForm({ formData, onSubmit }) {
           min="1"
           max="60"
           required
-          className="block w-full mt-1 p-2 bg-gray-700 border border-gray-600 rounded"
+          className="block w-full mt-1 p-2 border border-gray-600 rounded"
         />
       </div>
       <div>
@@ -117,18 +132,28 @@ function ComedyForm({ formData, onSubmit }) {
           value={data.cprompt}
           onChange={handleChange}
           placeholder="Write your own prompt..."
-          className="block w-full mt-1 p-2 bg-gray-700 border border-gray-600 rounded"
+          className="block w-full mt-1 p-2 border border-gray-600 rounded"
         />
       </div>
       <button
         type="submit"
-        className="w-full bg-teal-500 hover:bg-teal-600 text-white py-2 rounded font-semibold"
+        className="w-full bg-teal-500 mt-2 hover:bg-teal-600 text-white py-2 rounded font-semibold"
         disabled={loading}
       >
         {loading ? 'Generating...' : 'Generate Script'}
       </button>
-    </form>
-  );
-}
+      <button
+        onClick={handleClick}
+        className="w-full bg-teal-500 mt-2 hover:bg-teal-600 text-white py-2 rounded font-semibold"
+        disabled={loading}
+      >
+        Generate Video
+      </button>
+      </form>
+    </div>
 
-export default ComedyForm;
+  );
+};
+
+export default OptionsPanel;
+

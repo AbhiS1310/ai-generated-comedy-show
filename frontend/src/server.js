@@ -1,0 +1,1 @@
+export const server = "https://ai-generated-comedy-show.vercel.app";
