@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Welcome = () => {
   return (
@@ -11,12 +12,12 @@ const Welcome = () => {
         <p className="text-xl mb-8">
           Generate hilarious comedy scripts and watch them come to life.
         </p>
-        <a
-          href="/generate-script"
+        <Link
+          to="/generate-script"
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Get Started
-        </a>
+        </Link>
       </div>
     </div>
   );
